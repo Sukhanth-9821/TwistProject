@@ -1,7 +1,7 @@
 pipeline{
     agent any
     parameters {
-        string(name: 'BUILD_TYPE', defaultValue: 'Full', description: 'Select the build type')
+        string(name: 'Playbook', defaultValue: '.yml', description: 'Select the playbook name')
         choice(name: 'DEPLOY_ENV', choices: ['Development', 'Staging', 'Production'], description: 'Select the deployment environment')
     }
     stages{
@@ -10,10 +10,19 @@ pipeline{
                 git branch: 'main', url: 'https://github.com/Sukhanth-9821/TwistProject.git'
             }
         }
-        stage ("Ansible Run"){
+        stage ("file copy to Ansible folder"){
             steps{
-                echo "Deploying to ${params.BUILD_TYPE}"
+                echo "path==> ${pwd}"
+                sh ("sudo cp ${pwd}/workspace/ansible-automation/ansible_commands/* /etc/ansible/playbook/")
+                sh ("sudo ls -al /etc/ansible/playbook/")
             }        
         }
+        stage("Invoke Playbook"){
+            steps{
+                echo "playbook --> ${params.Playbook}"
+                ansiblePlaybook installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: '/etc/ansible/playbook/${params.Playbook}', vaultTmpPath: ''
+            }
+        }
+
     }
 }
