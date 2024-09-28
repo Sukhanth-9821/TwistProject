@@ -1,0 +1,19 @@
+pipeline{
+    agent any
+    parameters {
+        string(name: 'BUILD_TYPE', defaultValue: 'Full', description: 'Select the build type')
+        choice(name: 'DEPLOY_ENV', choices: ['Development', 'Staging', 'Production'], description: 'Select the deployment environment')
+    }
+    stages{
+        stage ("Ansible Source fetch"){
+            steps{
+                git branch: 'main', url: 'https://github.com/Sukhanth-9821/TwistProject.git'
+            }
+        }
+        stage ("Ansible Run"){
+            steps{
+                echo "Deploying to ${params.BUILD_TYPE}"
+            }        
+        }
+    }
+}

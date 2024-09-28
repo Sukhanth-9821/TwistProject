@@ -1,0 +1,35 @@
+---
+- host: all
+  become: true
+  tasks:
+    - name: Install required packages
+      yum:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+        state: present
+    - name: add docker gpg
+      rpm_key:
+        state: present
+        key: https://download.docker.com/linux/centos/gpg
+    - name: Add Docker Repository
+      yum_repository:
+        name: docker-ce
+        description: Docker Repository
+        baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+        enabled: yes
+
+    - name: Update cache and install docker-ce
+      yum:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
