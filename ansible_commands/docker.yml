@@ -2,37 +2,59 @@
 - hosts: all
   become: true
   tasks:
-    - name: Install required packages
+    - name: Install yum utils
       yum:
-        name:
-          - yum-utils
-          - device-mapper-persistent-data
-          - lvm2
-          - epel-release
-          - fuse-overlayfs
-          - slirp4netns
-        state: present
-    - name: add docker gpg
-      rpm_key:
-        state: present
-        key: https://download.docker.com/linux/centos/gpg
-    - name: Add Docker Repository
-      yum_repository:
-        name: docker-ce
-        description: Docker Repository
-        baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
-        gpgcheck: yes
-        gpgkey: https://download.docker.com/linux/centos/gpg
-        enabled: yes
-
-    - name: Update cache and install docker-ce
-      yum:
-        name: docker-ce-20.10.12-3.el7
+        name: yum-utils
         state: latest
-        update_cache: true
 
-    - name: Start and enable Docker service
-      systemd:
+    - name: Install device-mapper-persistent-data
+      yum:
+        name: device-mapper-persistent-data
+        state: latest
+
+    - name: Install lvm2
+      yum:
+        name: lvm2
+        state: latest
+
+    - name: Add Docker repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docer-ce.repo
+      become: yes
+
+    - name: Enable Docker Edge repo
+      ini_file:
+        dest: /etc/yum.repos.d/docer-ce.repo
+        section: 'docker-ce-edge'
+        option: enabled
+        value: 0
+      become: yes
+
+    - name: Enable Docker Test repo
+      ini_file:
+        dest: /etc/yum.repos.d/docer-ce.repo
+        section: 'docker-ce-test'
+        option: enabled
+        value: 0
+      become: yes
+
+    - name: Install Docker
+      package:
+        name: docker-ce
+        state: latest
+      become: yes
+
+    - name: Start Docker service
+      service:
         name: docker
         state: started
         enabled: yes
+      become: yes
+
+    - name: Add user vagrant to docker group
+      user:
+        name: vagrant
+        groups: docker
+        append: yes
+      become: yes
