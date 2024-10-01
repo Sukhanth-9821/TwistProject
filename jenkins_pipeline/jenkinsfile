@@ -13,6 +13,8 @@ pipeline{
         stage ("file copy to Ansible folder"){
             steps{
                 echo "path==> ${pwd}"
+                echo "making playbook folder"
+                sh ("sudo mkdir -p /etc/ansible/playbook")
                 sh ("sudo cp ${pwd}/workspace/ansible-automation/ansible_commands/* /etc/ansible/playbook/")
                 sh ("sudo ls -al /etc/ansible/playbook/")
             }        

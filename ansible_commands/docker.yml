@@ -8,6 +8,9 @@
           - yum-utils
           - device-mapper-persistent-data
           - lvm2
+          - epel-release
+          - fuse-overlayfs
+          - slirp4netns
         state: present
     - name: add docker gpg
       rpm_key:
@@ -24,7 +27,7 @@
 
     - name: Update cache and install docker-ce
       yum:
-        name: docker-ce
+        name: docker-ce-20.10.12-3.el7
         state: latest
         update_cache: true
 

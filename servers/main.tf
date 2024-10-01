@@ -52,6 +52,11 @@ resource "aws_instance" "tp-jenkins" {
 #     network_interface_id = aws_network_interface.tp-nic01.id
 #     device_index         = 0
 #   }
+    root_block_device {
+    volume_size = "20"  # Size in GB
+    volume_type = "gp3"  # General Purpose SSD (gp3); you can also use gp2, io1, etc.
+    delete_on_termination = true  # Ensure the volume is deleted when the instance is terminated
+  }
   user_data  = file("C:\\Users\\DELL\\Downloads\\SukhanthAWSDevOps\\Projects\\TwistProject\\servers\\userscript.sh") 
   associate_public_ip_address = true
   vpc_security_group_ids = ["${aws_security_group.tp_allow_tls.id}"]
