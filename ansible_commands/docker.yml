@@ -1,6 +1,7 @@
 ---
 - name: Install docker on a Centos 7 machine
   hosts: all
+  become: true
 
   tasks:
     - name: Install pre-requisite packages
