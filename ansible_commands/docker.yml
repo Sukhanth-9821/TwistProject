@@ -1,80 +1,24 @@
 ---
-- hosts: all
-  become: true
+- name: Install docker on a Centos 7 machine
+  hosts: localhost
+
   tasks:
-    - name: Install yum utils
-      yum:
-        name: yum-utils
-        state: latest
+  - name: Install pre-requisite packages
+    yum:
+      name: "{{item}}"
+      state: latest
+      loop:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
 
-    - name: Install device-mapper-persistent-data
-      yum:
-        name: device-mapper-persistent-data
-        state: latest
+  - name: Add Docker CE repo
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docker-ce.repo
 
-    - name: Install lvm2
-      yum:
-        name: lvm2
-        state: latest
+  - name: Install Docker
+    yum: name=docker state=latest
 
-    - name: Add Docker repo
-      get_url:
-        url: https://download.docker.com/linux/centos/docker-ce.repo
-        dest: /etc/yum.repos.d/docer-ce.repo
-      become: yes
-
-    - name: Enable Docker Edge repo
-      ini_file:
-        dest: /etc/yum.repos.d/docer-ce.repo
-        section: 'docker-ce-edge'
-        option: enabled
-        value: 0
-      become: yes
-
-    - name: Enable Docker Test repo
-      ini_file:
-        dest: /etc/yum.repos.d/docer-ce.repo
-        section: 'docker-ce-test'
-        option: enabled
-        value: 0
-      become: yes
-
-    - name: Line in FIle
-      blockinfile:
-        path: /etc/yum.repos.d/docker-ce.repo
-        block: |
-          [centos-extras]
-          name=Centos extras - $basearch
-          baseurl=http://mirror.centos.org/centos/7/extras/x86_64
-          enabled=1
-          gpgcheck=1
-          gpgkey=http://centos.org/keys/RPM-GPG-KEY-CentOS-7
-        state: present
-    
-    - name: Install lvm2
-      yum:
-        name: 
-          - slirp4netns 
-          - fuse-overlayfs
-          - container-selinux
-        state: latest
-
-    - name: Install Docker
-      package:
-        name: docker-ce
-        state: latest
-      become: yes
-
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
-      become: yes
-
-    - name: Add user vagrant to docker group
-      user:
-        name: vagrant
-        groups: docker
-        append: yes
-      become: yes
+  - name: Start and enable the Docker daemon
+    service: name=docker state=started enabled=yes
