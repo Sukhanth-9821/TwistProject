@@ -3,22 +3,22 @@
   hosts: all
 
   tasks:
-  - name: Install pre-requisite packages
-    yum:
-      name: "{{ item }}"
-      state: latest
-      loop:
+    - name: Install pre-requisite packages
+      yum:
+        name: "{{ item }}"
+        state: latest
+      with_items:
         - yum-utils
         - device-mapper-persistent-data
         - lvm2
 
-  - name: Add Docker CE repo
-    get_url:
-      url: https://download.docker.com/linux/centos/docker-ce.repo
-      dest: /etc/yum.repos.d/docker-ce.repo
+    - name: Add Docker CE repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
 
-  - name: Install Docker
-    yum: name=docker state=latest
+    - name: Install Docker
+      yum: name=docker state=latest
 
-  - name: Start and enable the Docker daemon
-    service: name=docker state=started enabled=yes
+    - name: Start and enable the Docker daemon
+      service: name=docker state=started enabled=yes
