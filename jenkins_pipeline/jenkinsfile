@@ -21,12 +21,13 @@ pipeline{
         }
 
         stage ("Copying roles to ansible roles"){
-            sh ("sudo mkdir -p /etc/ansible/roles")
-            sh ("cp -r ${pwd}/workspace/ansible-automation/ansible_commands/roles/* /etc/ansible/roles")
-            sh ("sudo ls -al /etc/ansible/roles/")
-
+            steps{
+                sh ("sudo mkdir -p /etc/ansible/roles")
+                sh ("cp -r ${pwd}/workspace/ansible-automation/ansible_commands/roles/* /etc/ansible/roles")
+                sh ("sudo ls -al /etc/ansible/roles/")
+            }
         }
-        
+
         stage("Invoke Playbook"){
             steps{
                 echo "playbook --> ${params.Playbook}"
