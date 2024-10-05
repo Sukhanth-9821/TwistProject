@@ -1,0 +1,12 @@
+- name: Graffana Agent in static mode
+  hosts: all
+  become: true
+  pre_tasks:
+  - name: install python
+    yum: 
+      name: python3
+      state: present
+  roles:
+    - { role: grafana_role }
+  post_tasks:
+    - shell: echo 'goodbye in post'
