@@ -1,39 +1,39 @@
-pipeline{
+pipeline {
     agent any
     parameters {
         string(name: 'Playbook', defaultValue: '.yml', description: 'Select the playbook name')
         choice(name: 'DEPLOY_ENV', choices: ['Development', 'Staging', 'Production'], description: 'Select the deployment environment')
     }
-    stages{
-        stage ("Ansible Source fetch"){
-            steps{
+    stages {
+        stage("Ansible Source fetch") {
+            steps {
                 git branch: 'main', url: 'https://github.com/Sukhanth-9821/TwistProject.git'
             }
         }
-        stage ("file copy to Ansible folder"){
-            steps{
-                echo "path==> ${pwd}"
-                echo "making playbook folder"
-                sh ("sudo mkdir -p /etc/ansible/playbook")
-                sh ("sudo cp ${pwd}/workspace/ansible-automation/ansible_commands/* /etc/ansible/playbook/")
-                sh ("sudo ls -al /etc/ansible/playbook/")
-            }        
-        }
-
-        stage ("Copying roles to ansible roles"){
-            steps{
-                sh ("sudo mkdir -p /etc/ansible/roles")
-                sh ("cp -r ${pwd}/workspace/ansible-automation/ansible_commands/roles/* /etc/ansible/roles")
-                sh ("sudo ls -al /etc/ansible/roles/")
+        
+        stage("file copy to Ansible folder") {
+            steps {
+                echo "Path ==> ${pwd()}"
+                echo "Making playbook folder"
+                sh 'sudo mkdir -p /etc/ansible/playbook'
+                sh 'sudo cp ${WORKSPACE}/ansible-automation/ansible_commands/* /etc/ansible/playbook/'
+                sh 'sudo ls -al /etc/ansible/playbook/'
             }
         }
 
-        stage("Invoke Playbook"){
-            steps{
-                echo "playbook --> ${params.Playbook}"
+        stage("Copying roles to ansible roles") {
+            steps {
+                sh 'sudo mkdir -p /etc/ansible/roles'
+                sh 'sudo cp -r ${WORKSPACE}/ansible-automation/ansible_commands/roles/* /etc/ansible/roles'
+                sh 'sudo ls -al /etc/ansible/roles/'
+            }
+        }
+
+        stage("Invoke Playbook") {
+            steps {
+                echo "Playbook --> ${params.Playbook}"
                 ansiblePlaybook installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: "/etc/ansible/playbook/${params.Playbook}", vaultTmpPath: ''
             }
         }
-
     }
 }
